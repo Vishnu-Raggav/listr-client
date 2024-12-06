@@ -6,6 +6,9 @@ export default {
 			fontFamily: {
 				outfit: "Outfit, serif",
 			},
+			boxShadow: {
+				input: "0 4px 30px rgba(0, 0, 0, 0.1)",
+			},
 		},
 	},
 	plugins: [],
