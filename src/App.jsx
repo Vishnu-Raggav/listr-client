@@ -1,42 +1,47 @@
 // Components
+import { DiJekyllSmall } from "react-icons/di";
 import InputBar from "./components/InputBar";
 import TaskBox from "./components/TaskBox";
 
 // Libraries
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function App() {
 	const [tasks, setTasks] = useState([[]]);
+	const taskPopupDelay = useRef(0.1);
 
 	useEffect(() => {
 		// fetch tasks
-		const taskItems = [
-			"pay Utility Bills",
-			"Review and refactor go Codebase",
-		];
-
-		const initialTasks = [[]];
-		for (let taskItem of taskItems) {
-			addTask(taskItem, initialTasks);
-		}
-		setTasks(initialTasks);
+		fetch("http://localhost:8080/")
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.success) {
+					const initialTasks = [[]];
+					for (let task of data.tasks) {
+						addTask(task, initialTasks);
+					}
+					setTasks(initialTasks);
+				}
+			});
 	}, []);
 
-	const addTask = (newTaskName, currentTasks) => {
+	const addTask = (newTask, currentTasks) => {
 		const charWidth = 10;
-		const newTaskWidth = newTaskName.length * charWidth + 26;
+		const newTaskWidth = newTask.name.length * charWidth + 26;
 
 		let lastRowWidth = 0;
-		for (let taskName of tasks[tasks.length - 1]) {
-			lastRowWidth += taskName.length * charWidth + 26;
+		for (let taskName of currentTasks[currentTasks.length - 1]) {
+			lastRowWidth += taskName.name.length * charWidth + 26;
 		}
 
 		const totalWidth = lastRowWidth + newTaskWidth;
 		if (totalWidth > 1200) {
-			currentTasks.push([newTaskName]);
+			currentTasks.push([newTask]);
 		} else {
-			currentTasks[currentTasks.length - 1].push(newTaskName);
+			if (currentTasks.length != 8) {
+				currentTasks[currentTasks.length - 1].push(newTask);
+			}
 		}
 	};
 
@@ -67,16 +72,26 @@ export default function App() {
 
 			{/* task grid */}
 			<div className="w-full h-full mt-10 flex flex-col gap-4">
-				{tasks.map((row, rowIndex) => (
-					<div
-						key={rowIndex}
-						className="flex items-center justify-center w-full h-[36px] gap-4"
-					>
-						{row.map((item, itemIndex) => (
-							<TaskBox key={itemIndex}>{item}</TaskBox>
-						))}
-					</div>
-				))}
+				{tasks &&
+					tasks.map((row, rowIndex) => (
+						<div
+							key={rowIndex}
+							className="flex items-center justify-center w-full h-[36px] gap-4"
+						>
+							{row.map((item, itemIndex) => (
+								<TaskBox
+									id={item.id}
+									key={item.id}
+									PopupDelay={
+										itemIndex * 0.2 + 0.05 + rowIndex
+									}
+									round={itemIndex % 2 == 0 ? true : false}
+								>
+									{item.name}
+								</TaskBox>
+							))}
+						</div>
+					))}
 			</div>
 		</div>
 	);
