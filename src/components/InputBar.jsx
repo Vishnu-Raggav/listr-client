@@ -28,7 +28,7 @@ export default function InputBar({ addTask, taskState, setTaskState }) {
 			.then((data) => {
 				if (data.success) {
 					const initialTasks = [...taskState];
-					addTask(data.task, initialTasks);
+					addTask({ ...data.task, addedHere: true }, initialTasks);
 					inputRef.current.value = "";
 					setTaskState(initialTasks);
 				}
@@ -36,7 +36,7 @@ export default function InputBar({ addTask, taskState, setTaskState }) {
 	};
 
 	return (
-		<motion.div className="relative bottom-[59px]" whileHover={{ y: -5 }}>
+		<motion.div className="relative bottom-[59px]">
 			<input
 				ref={inputRef}
 				onKeyDown={(e) => {
@@ -50,7 +50,10 @@ export default function InputBar({ addTask, taskState, setTaskState }) {
         `}
 				placeholder="write something quick..."
 			/>
-			<div
+			<motion.div
+				whileHover={{
+					rotate: 180,
+				}}
 				className={`
           absolute top-0 right-0 mt-1 mr-1 grid place-items-center
           rounded-full bg-[#E6E6E6] h-[36px] aspect-square cursor-pointer
@@ -64,7 +67,7 @@ export default function InputBar({ addTask, taskState, setTaskState }) {
 						}
 					}}
 				/>
-			</div>
+			</motion.div>
 		</motion.div>
 	);
 }
